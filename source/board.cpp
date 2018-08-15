@@ -49,6 +49,7 @@ void Board::Init()
 void Board::SetDebugLed(eDebugLed led, bool isOn)
 {
     uint16_t pin = (led == led1) ? GPIO_Pin_5 : GPIO_Pin_6;
+    return;
     if (isOn)
         GPIO_SetBits(GPIOE, pin);
     else

@@ -32,7 +32,9 @@ Product {
         "STM32F10X",
         "USE_STDPERIPH_DRIVER",
         "STM32F10X_MD",
-        "HSE_VALUE=16000000"
+        "HSE_VALUE=16000000",
+        "__STACK_SIZE=0x2000",
+        "__HEAP_SIZE=0x1000"
     ]
 
     Properties {
@@ -41,7 +43,6 @@ Product {
     }
 
     cpp.commonCompilerFlags: [
-        "-mfpu=vfp",
         "-O0",
         "-fdata-sections",
         "-ffunction-sections",
@@ -50,7 +51,6 @@ Product {
     cpp.driverFlags: [
         "-mthumb",
         "-mcpu=cortex-m3",
-        "-mfloat-abi=soft",
         "--specs=nosys.specs",
     ]
 

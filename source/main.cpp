@@ -32,17 +32,17 @@ int main()
 
     while(1)
     {
-        Board::SetDebugLed(Board::led1, 1);
+ /*       Board::SetDebugLed(Board::led1, 1);
         Board::SetDebugLed(Board::led2, 1);
-        DWT_DelayMs(250);
+        //DWT_DelayMs(250);
         Board::SetDebugLed(Board::led1, 0);
         Board::SetDebugLed(Board::led2, 1);
-        DWT_DelayMs(250);
+        //DWT_DelayMs(250);
         Board::SetDebugLed(Board::led1, 1);
         Board::SetDebugLed(Board::led2, 0);
-        DWT_DelayMs(250);
+        //DWT_DelayMs(250);
         Board::SetDebugLed(Board::led1, 0);
-        Board::SetDebugLed(Board::led2, 0);
+        Board::SetDebugLed(Board::led2, 0); */
         DWT_DelayMs(250);
     }
 
