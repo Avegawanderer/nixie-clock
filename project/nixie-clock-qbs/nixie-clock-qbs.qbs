@@ -41,22 +41,17 @@ Product {
     }
 
     cpp.commonCompilerFlags: [
-//        "-mthumb",
-//      "-mcpu=cortex-m3",
-//      "-msoft-float",
         "-mfpu=vfp",
         "-O0",
         "-fdata-sections",
         "-ffunction-sections",
-//        "-fno-inline",
-//        "-std=c++11",
-//        "-flto"
     ]
 
     cpp.driverFlags: [
         "-mthumb",
         "-mcpu=cortex-m3",
         "-mfloat-abi=soft",
+        "--specs=nosys.specs",
     ]
 
     cpp.linkerFlags: [
