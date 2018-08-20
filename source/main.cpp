@@ -1,7 +1,8 @@
 
 #include "stm32f10x.h"
-#include "board.h"
 #include "dwt_delay.h"
+#include "board.h"
+#include "adc.h"
 
 /*
 
@@ -23,27 +24,28 @@ Peripherals map:
 
 */
 
-
+extern "C" void initialise_monitor_handles(void);
 
 int main()
 {
+    initialise_monitor_handles();
     Board::Init();
-
+    Adc::Init();
 
     while(1)
     {
- /*       Board::SetDebugLed(Board::led1, 1);
-        Board::SetDebugLed(Board::led2, 1);
-        //DWT_DelayMs(250);
-        Board::SetDebugLed(Board::led1, 0);
-        Board::SetDebugLed(Board::led2, 1);
-        //DWT_DelayMs(250);
         Board::SetDebugLed(Board::led1, 1);
-        Board::SetDebugLed(Board::led2, 0);
-        //DWT_DelayMs(250);
-        Board::SetDebugLed(Board::led1, 0);
-        Board::SetDebugLed(Board::led2, 0); */
+        Board::SetDebugLed(Board::led2, 1);
         DWT_DelayMs(250);
+//        Board::SetDebugLed(Board::led1, 0);
+//        Board::SetDebugLed(Board::led2, 1);
+//        DWT_DelayMs(250);
+//        Board::SetDebugLed(Board::led1, 1);
+//        Board::SetDebugLed(Board::led2, 0);
+//        DWT_DelayMs(250);
+//        Board::SetDebugLed(Board::led1, 0);
+//        Board::SetDebugLed(Board::led2, 0);
+//        DWT_DelayMs(250);
     }
 
     return 0;

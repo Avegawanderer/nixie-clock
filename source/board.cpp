@@ -34,6 +34,10 @@ void Board::Init()
 
     //RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
 
+    // Init global interrupt options
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);     // 0 bits for pre-emption priority
+                                                        // 4 bits for subpriority
+
     // Init debug module used for delays
     DWT_Init();
 

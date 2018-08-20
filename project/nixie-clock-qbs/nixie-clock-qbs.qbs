@@ -33,8 +33,6 @@ Product {
         "USE_STDPERIPH_DRIVER",
         "STM32F10X_MD",
         "HSE_VALUE=16000000",
-        "__STACK_SIZE=0x2000",
-        "__HEAP_SIZE=0x1000"
     ]
 
     Properties {
@@ -43,7 +41,7 @@ Product {
     }
 
     cpp.commonCompilerFlags: [
-        "-O0",
+        "-O1",
         "-fdata-sections",
         "-ffunction-sections",
     ]
@@ -52,10 +50,15 @@ Product {
         "-mthumb",
         "-mcpu=cortex-m3",
         "--specs=nosys.specs",
+        "--specs=rdimon.specs",
+        "-lc",
+        "-lrdimon",
     ]
 
     cpp.linkerFlags: [
-        "-T"+path+"/linker/stm32f103c8_flash.ld",
+        "-T"+path+"/linker/libs.ld",
+        "-T"+path+"/linker/mem.ld",
+        "-T"+path+"/linker/sections.ld",
         "-Map="+path+"/output.map"
     ]
 
@@ -71,7 +74,7 @@ Product {
             "*.c",
             "*.cpp",
             "*.h",
-            "startup_ARMCM3.S",
+            "startup_stm32f10x_md.s",
         ]
         excludeFiles: [
         ]
