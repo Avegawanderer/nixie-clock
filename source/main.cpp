@@ -3,6 +3,7 @@
 #include "dwt_delay.h"
 #include "board.h"
 #include "adc.h"
+#include "hvreg.h"
 
 /*
 
@@ -31,21 +32,19 @@ int main()
     initialise_monitor_handles();
     Board::Init();
     Adc::Init();
+    HvReg::Init();
 
     while(1)
     {
+        HvReg::RegulateHv();
         Board::SetDebugLed(Board::led1, 1);
+        Board::SetDebugLed(Board::led2, 0);
+        DWT_DelayMs(500);
+
+        HvReg::RegulateHv();
+        Board::SetDebugLed(Board::led1, 0);
         Board::SetDebugLed(Board::led2, 1);
-        DWT_DelayMs(250);
-//        Board::SetDebugLed(Board::led1, 0);
-//        Board::SetDebugLed(Board::led2, 1);
-//        DWT_DelayMs(250);
-//        Board::SetDebugLed(Board::led1, 1);
-//        Board::SetDebugLed(Board::led2, 0);
-//        DWT_DelayMs(250);
-//        Board::SetDebugLed(Board::led1, 0);
-//        Board::SetDebugLed(Board::led2, 0);
-//        DWT_DelayMs(250);
+        DWT_DelayMs(500);
     }
 
     return 0;
