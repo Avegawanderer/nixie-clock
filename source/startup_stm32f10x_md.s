@@ -199,16 +199,16 @@ g_pfnVectors:
 *
 *******************************************************************************/
     
-  .weak	NMI_Handler
+    .weak	NMI_Handler
 	.thumb_set NMI_Handler,Default_Handler
-	
-  .weak	HardFault_Handler
-	.thumb_set HardFault_Handler,Default_Handler
-	
-  .weak	MemManage_Handler
+
+    //.weak	HardFault_Handler
+    //.thumb_set HardFault_Handler,Default_Handler
+
+    .weak	MemManage_Handler
 	.thumb_set MemManage_Handler,Default_Handler
 	
-  .weak	BusFault_Handler
+    .weak	BusFault_Handler
 	.thumb_set BusFault_Handler,Default_Handler
 
 	.weak	UsageFault_Handler
@@ -355,4 +355,25 @@ g_pfnVectors:
 	.weak	USBWakeUp_IRQHandler
 	.thumb_set USBWakeUp_IRQHandler,Default_Handler
 
+
+
+
+.section	.text
+    HardFault_Handler:
+                  TST     lr, #4          /* Determine correct stack */
+                  ITE     EQ
+                  MRSEQ   R0, MSP         /* Read MSP (Main) */
+                  MRSNE   R0, PSP         /* Read PSP (Process) */
+
+                  MOV     R1, R4          /* Registers R4-R6 */
+                  MOV     R2, R5
+                  MOV     R3, R6          /*  sourcer32@gmail.com */
+
+
+                  B       hard_fault_handler_c
+
+
+
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+
+

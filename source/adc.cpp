@@ -90,13 +90,13 @@ void Adc::Init()
 void Adc::DmaIsrHandler()
 {
     /////////////////////////////////////////////
-    static uint16_t cnt = 0;
-    if (++cnt == 10000)
-    {
-        for (uint8_t i=0; i<NumOfVfbCh + 1; i++)
-            printf("%04X\n", adcData[i]);
-        cnt = 0;
-    }
+//    static uint16_t cnt = 0;
+//    if (++cnt == 10000)
+//    {
+//        for (uint8_t i=0; i<NumOfVfbCh + 1; i++)
+//            printf("%04X\n", adcData[i]);
+//        cnt = 0;
+//    }
     /////////////////////////////////////////////
 
     // Filter ADC data
