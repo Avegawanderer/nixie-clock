@@ -1,6 +1,9 @@
-#include "adc.h"
+
 #include "stm32f10x.h"
 #include <stdio.h>
+#include "board.h"
+#include "adc.h"
+#include "hvreg.h"
 
 
 uint16_t Adc::adcData[Adc::NumOfVfbCh + 1];
@@ -21,6 +24,17 @@ void Adc::Init()
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
     RCC_ADCCLKConfig(RCC_PCLK2_Div8);                       // 64MHz / 8 = 8MHz (up to 14MHz)
 
+    // Setup inputs
+    GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AIN;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;       // Don't care for analog
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+    // Setup ADC
     ADC_InitTypeDef ADC_InitStructure;
     ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;
     ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
@@ -31,9 +45,9 @@ void Adc::Init()
     ADC_Init(ADC1, &ADC_InitStructure);
 
     // Setup single channel for regular group
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 1, ADC_SampleTime_28Cycles5);        // PHRES
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 1, ADC_SampleTime_239Cycles5);        // PHRES
     for (int i = 0; i < NumOfVfbCh; i++)
-        ADC_RegularChannelConfig(ADC1, ADC_Channel_3, i + 2, ADC_SampleTime_28Cycles5); // HVFB
+        ADC_RegularChannelConfig(ADC1, ADC_Channel_3, i + 2, ADC_SampleTime_71Cycles5); // HVFB
 
     // Enable ADC
     ADC_Cmd (ADC1,ENABLE);	//enable ADC1
@@ -99,6 +113,8 @@ void Adc::DmaIsrHandler()
 //    }
     /////////////////////////////////////////////
 
+    Board::SetDebugLed(Board::led1, 1);
+
     // Filter ADC data
     uint32_t acc = 0;
     for (uint8_t i=0; i<NumOfVfbCh; i++)
@@ -107,6 +123,11 @@ void Adc::DmaIsrHandler()
     // Save
     hvfbConvResult = acc / NumOfVfbCh;
     phresConvResult = adcData[0];
+
+    // Call the regulator
+    HvReg::RegulateHv();
+
+    Board::SetDebugLed(Board::led1, 0);
 }
 
 uint16_t Adc::getHvfbReading()

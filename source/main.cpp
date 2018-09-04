@@ -5,6 +5,7 @@
 #include "board.h"
 #include "adc.h"
 #include "hvreg.h"
+#include "rgbled.h"
 
 
 extern "C" void initialise_monitor_handles(void);
@@ -56,24 +57,48 @@ Peripherals map:
 
 int main()
 {
-    initialise_monitor_handles();
-    Board::Init();
-    Adc::Init();
-    HvReg::Init();
+    uint8_t rgb[3];
+    uint32_t i;
 
+#ifdef __DEBUG
+    initialise_monitor_handles();
+#endif
+    Board::Init();
+    HvReg::Init();
+    RgbLed::Init();
+    Adc::Init();
+
+#ifdef __DEBUG
     printf("Core clock: %lu\n", SystemCoreClock);
+#endif
+    rgb[0] = rgb[1] = rgb[2] = 255;
+    RgbLed::SetRgb(rgb[0],rgb[1],rgb[2]);
+    DWT_DelayMs(1000);
+    rgb[0] = rgb[1] = rgb[2] = 0;
+    RgbLed::SetRgb(rgb[0],rgb[1],rgb[2]);
+    DWT_DelayMs(1000);
 
     while(1)
     {
-        HvReg::RegulateHv();
-        Board::SetDebugLed(Board::led1, 1);
-        Board::SetDebugLed(Board::led2, 0);
-        DWT_DelayMs(500);
+        for (i=0; i<3; i++)
+        {
+            while(rgb[i] < 255)
+            {
+                rgb[i]++;
+                RgbLed::SetRgb(rgb[0],rgb[1],rgb[2]);
+                DWT_DelayUs(5000);
+            }
 
-        HvReg::RegulateHv();
-        Board::SetDebugLed(Board::led1, 0);
-        Board::SetDebugLed(Board::led2, 1);
-        DWT_DelayMs(500);
+            while(rgb[i] > 0)
+            {
+                rgb[i]--;
+                RgbLed::SetRgb(rgb[0],rgb[1],rgb[2]);
+                DWT_DelayUs(5000);
+            }
+        }
+
+//        Board::SetDebugLed(Board::led1, 0);
+//        Board::SetDebugLed(Board::led2, 1);
     }
 
     return 0;
