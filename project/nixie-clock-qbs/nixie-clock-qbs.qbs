@@ -28,17 +28,30 @@ Product {
     files: [        
     ]
 
-    cpp.defines: [
-        "STM32F10X",
-        "USE_STDPERIPH_DRIVER",
-        "STM32F10X_MD",
-        "HSE_VALUE=16000000",
-    ]
+//    cpp.defines: [
+//        "STM32F10X",
+//        "USE_STDPERIPH_DRIVER",
+//        "STM32F10X_MD",
+//        "HSE_VALUE=16000000",
+//    ]
 
-    Properties {
-        condition: cpp.debugInformation
-        cpp.defines: outer.concat("DEBUG")
+//    Properties {
+//        condition: cpp.debugInformation
+//        cpp.defines: outer.concat("__DEBUG")
+//    }
+
+    cpp.defines: {
+        var defines = [
+            "STM32F10X",
+            "USE_STDPERIPH_DRIVER",
+            "STM32F10X_MD",
+            "HSE_VALUE=16000000",
+        ];
+        if (qbs.buildVariant.contains("debug"))
+            defines.push("__DEBUG");
+        return defines;
     }
+
 
     cpp.commonCompilerFlags: [
         "-O1",
