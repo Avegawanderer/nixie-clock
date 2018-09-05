@@ -13,6 +13,9 @@ public:
 private:
     static void SetPwmDuty(uint16_t value);
     static const int TIM1ARR = 1000;            // Defines PWM resolution (more = greater) and PWM frequency (32MHz / ARR)
+    static float pid_iterm;
+    static float kp;
+    static float ki;
 };
 
 #endif // HVREG_H

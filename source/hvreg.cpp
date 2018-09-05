@@ -5,6 +5,9 @@
 #include "hvreg.h"
 #include "adc.h"
 
+float HvReg::pid_iterm;
+float HvReg::kp = 0.6;
+float HvReg::ki = 0.002;
 
 void HvReg::Init()
 {
@@ -46,6 +49,8 @@ void HvReg::Init()
 
     TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);
 
+    pid_iterm = 0;
+
     // Run
     TIM_Cmd(TIM1, ENABLE);
 
@@ -68,12 +73,17 @@ void HvReg::RegulateHv()
     // TODO: PI regulator
     uint16_t setpoint = (uint16_t)(((160.0f * 0.01f) / 3.3f) * 4095);
     int16_t error = setpoint - adcVal;
-    float kp = 0.5;
+    pid_iterm += error * ki;
     float pidSum = error * kp;
+    pidSum += pid_iterm;
     if (pidSum < 0)
         pidSum = 0;
-    else if (pidSum > TIM1ARR / 2)
-        pidSum = TIM1ARR / 2;
+    else if (pidSum > (TIM1ARR - (TIM1ARR / 8)))
+        pidSum = (TIM1ARR - (TIM1ARR / 8));
+
+    // Prevent wind-up
+    if (pid_iterm > TIM1ARR)
+        pid_iterm = TIM1ARR;
 
     SetPwmDuty(pidSum);
     Board::SetDebugLed(Board::led2, 0);
