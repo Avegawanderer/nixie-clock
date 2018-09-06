@@ -21,7 +21,7 @@ void RgbLed::Init()
     //------------------------------------//
     // Setup base timer
     TIM_TimeBaseInitTypeDef TIM_InitStructure;
-    TIM_InitStructure.TIM_Prescaler = (64 - 1);     // 1MHz @64MHz core clock
+    TIM_InitStructure.TIM_Prescaler = (32 - 1);     // 1MHz @32MHz APB1 clock
     TIM_InitStructure.TIM_Period = (255 - 1);       // 3.9kHz
     TIM_InitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_InitStructure.TIM_CounterMode = TIM_CounterMode_Up;

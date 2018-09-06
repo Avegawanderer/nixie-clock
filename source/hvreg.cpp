@@ -68,9 +68,9 @@ void HvReg::SetPwmDuty(uint16_t value)
 void HvReg::RegulateHv()
 {
     Board::SetDebugLed(Board::led2, 1);
+#if 0
     uint16_t adcVal = Adc::getHvfbReading();        // adc readings, [0..4095]
 
-    // TODO: PI regulator
     uint16_t setpoint = (uint16_t)(((160.0f * 0.01f) / 3.3f) * 4095);
     int16_t error = setpoint - adcVal;
     pid_iterm += error * ki;
@@ -84,8 +84,11 @@ void HvReg::RegulateHv()
     // Prevent wind-up
     if (pid_iterm > TIM1ARR)
         pid_iterm = TIM1ARR;
+    else if (pid_iterm < 0)
+        pid_iterm = 0;
 
     SetPwmDuty(pidSum);
+#endif
     Board::SetDebugLed(Board::led2, 0);
 }
 

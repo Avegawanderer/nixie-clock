@@ -28,21 +28,17 @@ void Board::Init()
     // HSI stays enabled as it is used for FLASH programming
 
     // Setup AHB and APB bus clock
-    RCC_HCLKConfig(RCC_SYSCLK_Div1);        // AHB bus clock
-    RCC_PCLK1Config(RCC_HCLK_Div1);         // APB1 bus clock
-    RCC_PCLK2Config(RCC_HCLK_Div1);         // APB2 bus clock
+    RCC_HCLKConfig(RCC_SYSCLK_Div1);        // AHB bus clock (max 72MHz)
+    RCC_PCLK1Config(RCC_HCLK_Div2);         // APB1 bus clock (max 36MHz)
+    RCC_PCLK2Config(RCC_HCLK_Div1);         // APB2 bus clock (max 72MHz)
 
     // Setup peripherals clock
-    //RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-    //RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE, ENABLE);
-
-    //RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+    // The rest is initialized by modules themself
 
     // Init global interrupt options
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);     // 0 bits for pre-emption priority

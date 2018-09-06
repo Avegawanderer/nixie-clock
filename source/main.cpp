@@ -6,6 +6,7 @@
 #include "adc.h"
 #include "hvreg.h"
 #include "rgbled.h"
+#include "tubectrl.h"
 
 
 extern "C" void initialise_monitor_handles(void);
@@ -67,6 +68,7 @@ int main()
     HvReg::Init();
     RgbLed::Init();
     Adc::Init();
+    TubeCtrl::Init();
 
 #ifdef __DEBUG
     printf("Core clock: %lu\n", SystemCoreClock);
@@ -78,24 +80,30 @@ int main()
     RgbLed::SetRgb(rgb[0],rgb[1],rgb[2]);
     DWT_DelayMs(1000);
 
+    TubeCtrl::SetTubeDigits(1,2,3,4,5,6);
+
     while(1)
     {
-        for (i=0; i<3; i++)
-        {
-            while(rgb[i] < 255)
-            {
-                rgb[i]++;
-                RgbLed::SetRgb(rgb[0],rgb[1],rgb[2]);
-                DWT_DelayUs(5000);
-            }
+        DWT_DelayUs(1000);
+        TubeCtrl::ProcessIndication();
 
-            while(rgb[i] > 0)
-            {
-                rgb[i]--;
-                RgbLed::SetRgb(rgb[0],rgb[1],rgb[2]);
-                DWT_DelayUs(5000);
-            }
-        }
+
+//        for (i=0; i<3; i++)
+//        {
+//            while(rgb[i] < 255)
+//            {
+//                rgb[i]++;
+//                RgbLed::SetRgb(rgb[0],rgb[1],rgb[2]);
+//                DWT_DelayUs(5000);
+//            }
+
+//            while(rgb[i] > 0)
+//            {
+//                rgb[i]--;
+//                RgbLed::SetRgb(rgb[0],rgb[1],rgb[2]);
+//                DWT_DelayUs(5000);
+//            }
+//        }
 
 //        Board::SetDebugLed(Board::led1, 0);
 //        Board::SetDebugLed(Board::led2, 1);
