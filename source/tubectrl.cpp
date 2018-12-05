@@ -4,7 +4,7 @@
 #include "tubectrl.h"
 
 
-uint8_t TubeCtrl::tube_digits[6];
+int8_t TubeCtrl::tube_digits[6];
 uint8_t TubeCtrl::tube_dots[6];
 uint8_t TubeCtrl::tube_commas[6];
 uint8_t TubeCtrl::bulb_dots[2];
@@ -13,34 +13,34 @@ uint8_t TubeCtrl::bulb_dots[2];
 
 // First group (H1 (first left to right) - H3 (third left to right)
 uint8_t TubeCtrl::encodeTable13[12] = {
-    13,         // bit position for "0"
-    6,          // bit position for "1"
-    5,
-    4,
-    3,          // "4"
-    1,
-    0,          // "6"
-    2,
-    15,
-    14,         // bit position for "9"
-    7,          // bit position for "."
-    12,         // bit position for ","
+    15, //13,         // bit position for "0"
+    3,  //6,          // bit position for "1"
+    4,  //5,
+    5,  //4,
+    6,  //3,          // "4"
+    7,  //1,
+    0,  //0,          // "6"
+    12,  //2,
+    13, //15,
+    14, //14,         // bit position for "9"
+    2,  //7,          // bit position for "."
+    1, //12,         // bit position for ","
 };
 
 // Second group (H4 (fourth left to right) - H6 (sixs left to right)
 uint8_t TubeCtrl::encodeTable46[12] = {
-    17,         // bit position for "0"
-    10,         // bit position for "1"
-    9,
-    8,
-    20,
-    22,
-    23,
-    21,
-    19,
-    18,          // bit position for "9"
-    16,          // bit position for "."
-    11,          // bit position for ","
+    19, //17,         // bit position for "0"
+    20, //10,         // bit position for "1"
+    8,  //9,
+    9,  //8,
+    10, //20,         // "4"
+    11, //22,
+    23, //23,         // "6"
+    16, //21,
+    17, //19,
+    18, //18,          // bit position for "9"
+    21, //16,          // bit position for "."
+    22, //11,          // bit position for ","
 };
 
 void TubeCtrl::Init()
@@ -68,8 +68,8 @@ void TubeCtrl::Init()
     GPIO_Config.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
     GPIO_Config.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_Config.GPIO_Speed = GPIO_Speed_10MHz;
-    GPIO_Init(GPIOE, &GPIO_Config);
-    GPIO_ResetBits(GPIOE, GPIO_Config.GPIO_Pin);
+    GPIO_Init(GPIOB, &GPIO_Config);
+    GPIO_ResetBits(GPIOB, GPIO_Config.GPIO_Pin);
 
     // SPI
     SPI_InitTypeDef SPI_InitStruct;
@@ -98,7 +98,7 @@ void TubeCtrl::Init()
 
     for (int i=0; i<6; i++)
     {
-        tube_digits[i] = 0;
+        tube_digits[i] = -1;
         tube_commas[i] = 0;
         tube_dots[i] = 0;
     }
@@ -109,7 +109,7 @@ void TubeCtrl::Init()
 }
 
 
-void TubeCtrl::SetTubeDigits(uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, uint8_t d6)
+void TubeCtrl::SetTubeDigits(int8_t d1, int8_t d2, int8_t d3, int8_t d4, int8_t d5, int8_t d6)
 {
     tube_digits[0] = d1;
     tube_digits[1] = d2;
@@ -117,6 +117,16 @@ void TubeCtrl::SetTubeDigits(uint8_t d1, uint8_t d2, uint8_t d3, uint8_t d4, uin
     tube_digits[3] = d4;
     tube_digits[4] = d5;
     tube_digits[5] = d6;
+}
+
+
+void TubeCtrl::SetTubeDigits(char *text)
+{
+    uint8_t i;
+    for (i = 0; i<6; i++)
+    {
+        tube_digits[i] = ((text[i] >= '0') && (text[i] <= '9')) ? text[i] - '0' : - 1;
+    }
 }
 
 
@@ -171,13 +181,15 @@ void TubeCtrl::ProcessIndication()
     {
         case 0:
             // Encode two digits for simultaneous displaying
-            SetBitInVector(encodeTable13[tube_digits[0]], encVector);
+            if (tube_digits[0] >= 0)
+                SetBitInVector(encodeTable13[tube_digits[0]], encVector);
             if (tube_dots[0])
                 SetBitInVector(encodeTable13[10], encVector);
             if (tube_commas[0])
                 SetBitInVector(encodeTable13[11], encVector);
 
-            SetBitInVector(encodeTable46[tube_digits[3]], encVector);
+            if (tube_digits[3] >= 0)
+                SetBitInVector(encodeTable46[tube_digits[3]], encVector);
             if (tube_dots[3])
                 SetBitInVector(encodeTable46[10], encVector);
             if (tube_commas[3])
@@ -190,6 +202,7 @@ void TubeCtrl::ProcessIndication()
             while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY));
             SPI_I2S_SendData(SPI2, encVector[0]);
             while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY));
+            DWT_DelayUs(5);
             // Set STC (push clocked data to outputs)
             GPIO_SetBits(GPIOE, GPIO_Pin_8);
             DWT_DelayUs(10);
@@ -211,13 +224,15 @@ void TubeCtrl::ProcessIndication()
             break;
         case 1:
             // Encode two digits for simultaneous displaying
-            SetBitInVector(encodeTable13[tube_digits[1]], encVector);
+            if (tube_digits[1] >= 0)
+                SetBitInVector(encodeTable13[tube_digits[1]], encVector);
             if (tube_dots[1])
                 SetBitInVector(encodeTable13[10], encVector);
             if (tube_commas[1])
                 SetBitInVector(encodeTable13[11], encVector);
 
-            SetBitInVector(encodeTable46[tube_digits[4]], encVector);
+            if (tube_digits[4] >= 0)
+                SetBitInVector(encodeTable46[tube_digits[4]], encVector);
             if (tube_dots[4])
                 SetBitInVector(encodeTable46[10], encVector);
             if (tube_commas[4])
@@ -230,9 +245,10 @@ void TubeCtrl::ProcessIndication()
             while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY));
             SPI_I2S_SendData(SPI2, encVector[0]);
             while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY));
+            DWT_DelayUs(10);
             // Set STC (push clocked data to outputs)
             GPIO_SetBits(GPIOE, GPIO_Pin_8);
-            DWT_DelayUs(10);
+            DWT_DelayUs(5);
             // Enable anode drivers
             GPIO_SetBits(GPIOE, GPIO_Pin_10 | GPIO_Pin_14);
             // Select digit for next entry
@@ -240,13 +256,15 @@ void TubeCtrl::ProcessIndication()
             break;
         case 2:
             // Encode two digits for simultaneous displaying
-            SetBitInVector(encodeTable13[tube_digits[2]], encVector);
+            if (tube_digits[2] >= 0)
+                SetBitInVector(encodeTable13[tube_digits[2]], encVector);
             if (tube_dots[2])
                 SetBitInVector(encodeTable13[10], encVector);
             if (tube_commas[2])
                 SetBitInVector(encodeTable13[11], encVector);
 
-            SetBitInVector(encodeTable46[tube_digits[5]], encVector);
+            if (tube_digits[5] >= 0)
+                SetBitInVector(encodeTable46[tube_digits[5]], encVector);
             if (tube_dots[5])
                 SetBitInVector(encodeTable46[10], encVector);
             if (tube_commas[5])
@@ -259,6 +277,7 @@ void TubeCtrl::ProcessIndication()
             while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY));
             SPI_I2S_SendData(SPI2, encVector[0]);
             while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY));
+            DWT_DelayUs(5);
             // Set STC (push clocked data to outputs)
             GPIO_SetBits(GPIOE, GPIO_Pin_8);
             DWT_DelayUs(10);

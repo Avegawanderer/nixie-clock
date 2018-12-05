@@ -54,7 +54,7 @@ Product {
 
 
     cpp.commonCompilerFlags: [
-        "-O1",
+        "-O0",
         "-fdata-sections",
         "-ffunction-sections",
     ]
@@ -66,6 +66,7 @@ Product {
         "--specs=rdimon.specs",
         "-lc",
         "-lrdimon",
+        "-Wl,--gc-sections"     // Remove unreferenced sections
     ]
 
     cpp.linkerFlags: [

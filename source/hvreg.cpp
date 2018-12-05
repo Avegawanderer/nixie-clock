@@ -1,6 +1,7 @@
 
 #include "stm32f10x.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include "board.h"
 #include "hvreg.h"
 #include "adc.h"
@@ -28,7 +29,7 @@ void HvReg::Init()
     // Setup base timer
     TIM_TimeBaseInitTypeDef TIM_InitStructure;
     TIM_InitStructure.TIM_Prescaler = (2 - 1);      // 32MHz @64MHz core clock
-    TIM_InitStructure.TIM_Period = (TIM1ARR - 1);      // 32kHz
+    TIM_InitStructure.TIM_Period = (TIM1ARR - 1);
     TIM_InitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_InitStructure.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_InitStructure.TIM_RepetitionCounter = 0x0000;
@@ -67,8 +68,8 @@ void HvReg::SetPwmDuty(uint16_t value)
 
 void HvReg::RegulateHv()
 {
-    Board::SetDebugLed(Board::led2, 1);
-#if 0
+    Board::SetDebugLed(Board::led2, 0);
+#if 1
     uint16_t adcVal = Adc::getHvfbReading();        // adc readings, [0..4095]
 
     uint16_t setpoint = (uint16_t)(((160.0f * 0.01f) / 3.3f) * 4095);
@@ -89,7 +90,8 @@ void HvReg::RegulateHv()
 
     SetPwmDuty(pidSum);
 #endif
-    Board::SetDebugLed(Board::led2, 0);
+    if (abs(error) < (uint16_t)(((2.0f * 0.01f) / 3.3f) * 4095))
+        Board::SetDebugLed(Board::led2, 1);
 }
 
 
